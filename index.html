@@ -1,326 +1,1031 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ridge Scout · 56721K</title>
-<meta name="theme-color" content="#0b0b0c">
-<style>
-:root{--bg:#0b0b0c;--card:#16161a;--line:#26262c;--tx:#f2f2f4;--mut:#8b8b95;--acc:#5b8cff;--good:#2fbf71;--red:#ff5d5d;--blue:#4c8dff;--star:#ffc23d}
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,Segoe UI,sans-serif}
-header{position:sticky;top:0;z-index:5;background:rgba(11,11,12,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:12px 16px calc(10px)}
-.row{display:flex;align-items:center;gap:8px}.sp{flex:1}
-h1{font-size:19px;margin:0;letter-spacing:-.2px}.sub{color:var(--mut);font-size:12.5px}
-main{max-width:860px;margin:0 auto;padding:14px 14px 80px}
-.pill{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
-.pill.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.btn{background:var(--acc);color:#fff;border:0;border-radius:10px;padding:9px 14px;font-weight:600;cursor:pointer;font-size:14px}
-.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--tx)}
-input,textarea{width:100%;background:#0f0f12;border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:9px 11px;font:inherit}
-textarea{min-height:64px;resize:vertical}
-input:disabled,textarea:disabled{opacity:.85}
-section{margin:16px 0}h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin:0 0 8px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:10px}
-.match{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;padding:10px 12px}
-.mq{font-weight:700}.mt{color:var(--mut);font-size:12px}
-.al{display:flex;gap:6px;flex-wrap:wrap}.tm{font-size:13px;padding:3px 8px;border-radius:7px;cursor:pointer}
-.r{background:rgba(255,93,93,.14);color:#ffb3b3}.b{background:rgba(76,141,255,.15);color:#b7cfff}.us{outline:1.5px solid var(--tx);font-weight:700}
-.vs{color:var(--mut);font-size:12px;align-self:center}
-.th{display:flex;align-items:center;gap:10px}.tn{font-size:18px;font-weight:700}
-.stars{display:flex;gap:2px}.stars button{background:none;border:0;font-size:22px;line-height:1;color:#3a3a42;cursor:pointer;padding:0 1px}
-.stars button.on{color:var(--star)}.stars button:disabled{cursor:default}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.tag{font-size:12.5px;padding:5px 10px}
-.pick{font-size:12.5px}.pick.on{background:var(--good);border-color:var(--good)}
-.meta{color:var(--mut);font-size:12px;margin-top:6px}
-.nexts{color:var(--mut);font-size:12px}
-.status{font-size:12px;color:var(--mut)}.status.ok{color:var(--good)}.status.err{color:var(--red)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:9;padding:16px}
-.modal .card{width:100%;max-width:380px}
-.hidden{display:none!important}
-.tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.tools input{flex:1;min-width:140px}
-.banner{font-size:13px;color:var(--mut);padding:10px 12px;border:1px dashed var(--line);border-radius:12px;margin-top:10px}
-.evsel{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font:inherit;font-size:13px;max-width:200px}
-.big .card{max-width:520px}.mono{font:12.5px/1.45 ui-monospace,Menlo,monospace;min-height:120px}
-label.lb{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
-.file{border:1px dashed var(--line);border-radius:12px;padding:14px;text-align:center;color:var(--mut);cursor:pointer;display:block}
-</style>
-</head>
-<body>
-<header>
-  <div class="row">
-    <div><h1>Ridge Scout</h1><div class="sub" id="evSub">56721K</div></div>
-    <div class="sp"></div>
-    <span id="status" class="status">Loading…</span>
-    <button id="authBtn" class="btn ghost">Sign in</button>
-  </div>
-  <div class="tools">
-    <select id="evSel" class="evsel"></select><button class="pill hidden" id="newEv">+ Event</button><input id="q" placeholder="Search team, tag, or note">
-    <button class="pill" id="sortBtn">Sort: schedule</button>
-    <button class="pill" id="pickOnly">Would pick</button>
-  </div>
-</header>
-<main>
-  <div id="viewNote" class="banner">View only. Tap Sign in (top right) to edit.</div>
-  <section id="matchSec"><h2>Our matches</h2><div id="matches"></div></section>
-  <section><h2>Teams</h2><div id="teams"></div>
-    <div id="addWrap" class="card hidden"><div class="row"><input id="newTeam" placeholder="Add a team (e.g. 1234A)"><button class="btn" id="addTeam">Add</button></div></div>
-  </section>
-</main>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Ridge Scouting</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap"
+    />
+    <link rel="stylesheet" href="hark.css" />
+    <link rel="stylesheet" href="hark-hero.css" />
+    <link rel="stylesheet" href="hark-charts.css" />
+    <style>
+      .page { padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)); }
+      .x-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .x-top h1 { margin: 0; font: var(--type-heading); }
+      .x-top p { margin: 0; font: var(--type-caption); color: var(--text-secondary); }
+      .x-label { margin: 0 0 8px; font: var(--type-tag); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
 
-<div class="modal" id="modal"><div class="card">
-  <h2 style="margin-bottom:10px">Archer sign-in</h2>
-  <div id="step1"><input id="email" type="email" value="archerandorjohnson@gmail.com" autocomplete="email"><div class="tools"><button class="btn" id="sendCode">Email me a sign-in link</button><button class="btn ghost" id="cancel1">Cancel</button></div></div>
-  <div id="step2" class="hidden"><div class="meta" style="margin-bottom:8px">Check your email and tap the sign-in link on this device. If the email shows a code instead, type it here.</div><input id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="Code"><div class="tools"><button class="btn" id="verify">Sign in</button><button class="btn ghost" id="cancel2">Cancel</button></div></div>
-  <div id="authMsg" class="status" style="margin-top:8px"></div>
-</div></div>
+      /* Our matches strip */
+      .x-strip { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; scroll-snap-type: x proximity; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
+      .x-strip::-webkit-scrollbar { display: none; }
+      .x-match { flex: none; width: 236px; scroll-snap-align: start; padding: 10px; border-radius: var(--r-m); background: var(--fill-tertiary); display: grid; gap: 6px; }
+      .x-match.is-next { box-shadow: inset 0 0 0 1.5px var(--fill-primary); }
+      .x-match__head { display: flex; justify-content: space-between; gap: 8px; font: var(--type-label); }
+      .x-match__head span { font: var(--type-caption); color: var(--text-secondary); }
+      .x-all { display: grid; grid-template-columns: 34px 1fr 1fr; gap: 4px; align-items: stretch; }
+      .x-all__side { display: flex; align-items: center; gap: 4px; font: var(--type-tag); color: var(--text-secondary); }
+      .x-all__side::before { content: ""; width: 4px; align-self: stretch; border-radius: 2px; background: var(--fill-system-red); }
+      .x-all--blue .x-all__side::before { background: var(--chart-1); }
+      .x-team { position: relative; min-height: var(--tap); padding: 4px 8px; border-radius: var(--r-s); border: 1px solid var(--stroke-primary); background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-label); text-align: left; display: flex; flex-direction: column; justify-content: center; cursor: pointer; }
+      .x-team small { font: var(--type-caption); color: var(--text-secondary); }
+      .x-team.is-us { border-color: transparent; background: var(--fill-primary); color: var(--text-primary-on); font-weight: var(--weight-bold); cursor: default; }
+      .x-team.is-us small { color: var(--text-secondary-on); }
+      .x-team.has-notes::after { content: ""; position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--fill-system-green); }
+      .x-team:active:not(.is-us) { transform: scale(0.97); }
 
-<div class="modal big" id="evModal"><div class="card">
-  <h2 style="margin-bottom:6px">New event</h2>
-  <label class="lb">Event name</label><input id="evName" placeholder="e.g. Grand Forks Dec 12">
-  <label class="lb">Our team</label><input id="evUs" value="56721K">
-  <label class="lb">Schedule or team list photos (optional, add as many as you want)</label>
-  <label class="file" for="evFile" id="fileLbl">Tap to add a photo</label><input id="evFile" type="file" accept="image/*" multiple class="hidden">
-  <div id="ocrMsg" class="status" style="margin-top:6px"></div>
-  <label class="lb">Matches (one per line: Q8 10:11 AM | red red | blue blue) — fix anything misread</label>
-  <textarea id="evMatches" class="mono" placeholder="Q8 10:11 AM | 56721K 11532D | 56549B 59936A"></textarea>
-  <label class="lb">Teams (space or line separated)</label>
-  <textarea id="evTeams" class="mono" style="min-height:70px"></textarea>
-  <div class="tools"><button class="btn" id="evSave">Create event</button><button class="btn ghost" id="evCancel">Cancel</button></div>
-  <div id="evMsg" class="status" style="margin-top:6px"></div>
-</div></div>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPA_URL = "https://mtcfiumybawwwcioawyv.supabase.co";
-const SUPA_KEY = "sb_publishable_Z_WT3N7VKT3wGLj0slXaaA_ndnqSf5P";
-const OWNER = "archerandorjohnson@gmail.com";
-const TAGS = ["Fast drive","Strong auton","Good intake","High scorer","Defense","Consistent","Good driver","Breaks down","Endgame"];
-const DEFAULT_EV = { id:"fisher-2026", name:"Fisher · Nov 14, 2026", us:"56721K", created:"2026-11-14T08:00:00Z", teams:[], matches:[
-  ["Q8","10:11 AM",["56721K","11532D"],["56549B","59936A"]],
-  ["Q16","10:50 AM",["9821G","56721A"],["81207F","56721K"]],
-  ["Q21","11:15 AM",["56549E","56721K"],["11532J","9821F"]],
-  ["Q39","12:45 PM",["96671H","30029B"],["56721K","5450C"]],
-  ["Q48","1:30 PM",["56721K","5450D"],["11532R","1532C"]],
-  ["Q55","2:05 PM",["11532H","11532A"],["56721K","56549A"]],
-  ["Q64","2:50 PM",["81207E","59936B"],["9821A","56721K"]],
-]};
+      /* Tools row */
+      .x-tools { display: grid; gap: 8px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 0px); z-index: 10; padding-block: 8px; background: var(--fill-primary-on); }
+      .x-input { width: 100%; min-height: var(--tap); padding: 10px 14px; border-radius: var(--r-s); border: 1px solid var(--stroke-primary); background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-body); font-size: 16px; }
+      .x-input:focus { outline: 2px solid var(--fill-primary); outline-offset: -1px; }
+      .x-row { display: flex; gap: 8px; }
+      .x-row .x-input { flex: 1; min-width: 0; }
+      .x-seg { display: flex; padding: 3px; border-radius: var(--r-pill); background: var(--fill-tertiary); }
+      .x-seg button { flex: 1; min-height: var(--tap); border: 0; border-radius: var(--r-pill); background: transparent; color: var(--text-secondary); font: var(--type-label); cursor: pointer; }
+      .x-seg button[aria-pressed="true"] { background: var(--fill-primary); color: var(--text-primary-on); }
+      .x-sortrow { display: flex; align-items: center; gap: 8px; }
+      .x-sortrow .x-seg { flex: 1; }
+      .x-count { font: var(--type-caption); color: var(--text-secondary); white-space: nowrap; }
 
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});
-let events = {};   // id -> meta
-let notes = {};    // id -> team -> {rating,tags,pick,note,updated_at}
-let cur = null, owner = false, sortMode = "schedule", pickOnly = false;
-const timers = {};
-const $ = id => document.getElementById(id);
-const blank = () => ({rating:0,tags:[],pick:false,note:""});
-const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const ev = () => events[cur];
-function setStatus(t, cls=""){ const s=$("status"); s.textContent=t; s.className="status "+cls; }
+      /* Team cards */
+      .x-teams { display: grid; gap: 8px; }
+      .x-card { border-radius: var(--r-m); background: var(--fill-tertiary); overflow: hidden; scroll-margin-top: 150px; }
+      .x-card.is-flash { box-shadow: inset 0 0 0 2px var(--fill-primary); }
+      .x-card__sum { width: 100%; min-height: 64px; padding: 12px 14px; border: 0; background: transparent; color: var(--text-primary); text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; cursor: pointer; font: var(--type-body); }
+      .x-card__num { font: var(--type-heading); display: flex; align-items: center; gap: 8px; }
+      .x-card__stars { font-size: 16px; letter-spacing: 1px; color: var(--text-primary); align-self: center; }
+      .x-card__stars .off { color: var(--text-secondary); }
+      .x-card__meta { grid-column: 1 / -1; font: var(--type-caption); color: var(--text-secondary); }
+      .x-card__tags { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px; }
+      .x-card__tags:empty, .x-card__meta:empty { display: none; }
+      .x-card__body { padding: 0 14px 14px; display: grid; gap: 14px; }
+      .x-card__body[hidden] { display: none; }
+      .x-group { display: grid; gap: 6px; }
+      .x-toggles { display: flex; flex-wrap: wrap; gap: 6px; }
+      .x-tog { min-height: var(--tap); padding: 6px 14px; border-radius: var(--r-pill); border: 1px solid var(--stroke-primary); background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-label); cursor: pointer; }
+      .x-tog[aria-pressed="true"] { background: var(--fill-primary); color: var(--text-primary-on); border-color: transparent; }
+      .x-tog:active { transform: scale(0.96); }
+      .x-rate { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+      .x-star { width: var(--tap); height: var(--tap); border: 0; border-radius: var(--r-s); background: var(--fill-primary-on); color: var(--text-secondary); font-size: 22px; line-height: 1; cursor: pointer; }
+      .x-star.is-on { color: var(--text-primary); }
+      .x-rate .x-tog { margin-left: auto; }
+      .x-area { width: 100%; min-height: 72px; resize: none; overflow: hidden; padding: 10px 14px; border-radius: var(--r-s); border: 1px solid var(--stroke-primary); background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-body); font-size: 16px; }
+      .x-area:focus { outline: 2px solid var(--fill-primary); outline-offset: -1px; }
+      .x-notes { list-style: none; margin: 0; padding: 0; display: grid; }
+      .x-notes li { display: flex; align-items: center; gap: 8px; padding: 4px 0 4px 2px; border-bottom: 1px solid var(--stroke-secondary); font: var(--type-small); }
+      .x-notes li span { flex: 1; overflow-wrap: anywhere; }
+      .x-notes time { color: var(--text-secondary); white-space: nowrap; }
+      .x-del { flex: none; width: var(--tap); height: var(--tap); border: 0; border-radius: var(--r-s); background: transparent; color: var(--text-secondary); font-size: 20px; cursor: pointer; }
+      .x-del:hover { background: var(--hover-wash); }
+      .x-empty { padding: 24px; text-align: center; color: var(--text-secondary); font: var(--type-small); }
+      .x-btn { min-height: var(--tap); padding: 0 16px; border-radius: var(--r-s); border: 1px solid var(--stroke-primary); background: var(--fill-primary-on); color: var(--text-primary); font: var(--type-label); cursor: pointer; white-space: nowrap; }
+      .x-btn--solid { background: var(--fill-primary); color: var(--text-primary-on); border-color: transparent; }
 
-function ingest(r){
-  if (r.team.startsWith("ev:")) { events[r.team.slice(3)] = {...r.data, id:r.team.slice(3), saved:true}; }
-  else if (r.team.startsWith("t:")) { const [, id, ...rest] = r.team.split(":"); const t = rest.join(":");
-    (notes[id] = notes[id]||{})[t] = {...blank(), ...r.data, updated_at:r.updated_at}; }
-}
+      /* Export bar */
+      .x-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 8px var(--gutter) calc(8px + env(safe-area-inset-bottom, 0px)); background: var(--mat-agent); -webkit-backdrop-filter: var(--hark-blur); backdrop-filter: var(--hark-blur); border-top: 1px solid var(--stroke-primary); }
+      .x-bar__in { max-width: var(--page-max); margin: 0 auto; display: grid; gap: 6px; }
+      .x-bar .x-row .x-btn { flex: 1; }
+      .x-bar p { margin: 0; text-align: center; font: var(--type-caption); color: var(--text-secondary); }
 
-function teamOrder(e){
-  const o=[]; (e.matches||[]).forEach(m=>[...m[2],...m[3]].forEach(t=>{ if(t!==e.us && !o.includes(t)) o.push(t); }));
-  const rest=[...(e.teams||[]), ...Object.keys(notes[e.id]||{})].filter(t=>t!==e.us && !o.includes(t));
-  return [...o, ...[...new Set(rest)].sort((a,b)=>parseInt(a)-parseInt(b)||a.localeCompare(b))];
-}
-function nextMatch(e,t){
-  for (const m of e.matches||[]){ const ours=m[2].includes(e.us)?m[2]:m[3].includes(e.us)?m[3]:null; if(!ours) continue;
-    if (ours.includes(t)) return m[0]+" "+m[1]+" · with us"; if ([...m[2],...m[3]].includes(t)) return m[0]+" "+m[1]+" · against us"; }
-  return "";
-}
+      /* Full-screen text */
+      .x-sheet { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; gap: 8px; padding: calc(12px + env(safe-area-inset-top, 0px)) var(--gutter) calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--fill-primary-on); }
+      .x-sheet[hidden] { display: none; }
+      .x-sheet__head { display: flex; align-items: center; gap: 8px; }
+      .x-sheet__head h2 { flex: 1; margin: 0; font: var(--type-heading); }
+      .x-sheet textarea { flex: 1; width: 100%; resize: none; padding: 12px; border-radius: var(--r-s); border: 1px solid var(--stroke-primary); background: var(--fill-tertiary); color: var(--text-primary); font: 14px/1.45 "Geist Mono", ui-monospace, monospace; }
+    
+      /* Cloud additions, in the page's own style */
+      .x-top__side { display: flex; align-items: center; gap: 8px; flex: none; }
+      .x-save { font: var(--type-caption); color: var(--text-secondary); white-space: nowrap; }
+      .x-save.is-ok::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--fill-system-green); vertical-align: 1px; }
+      .x-save.is-err { color: var(--fill-system-red); }
+      .x-evrow { display: flex; gap: 8px; }
+      .x-evrow select.x-input { flex: 1; min-width: 0; appearance: none; -webkit-appearance: none; padding-right: 34px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%; background-size: 5px 5px; background-repeat: no-repeat; }
+      .x-sheet--sm { top: auto; max-height: 92vh; border-top: 1px solid var(--stroke-primary); border-radius: var(--r-m) var(--r-m) 0 0; box-shadow: 0 -12px 40px rgb(0 0 0 / 0.18); }
+      .x-sheet--scroll { overflow-y: auto; }
+      .x-sheet--scroll textarea { flex: none; min-height: 120px; }
+      .x-sheet__in { width: 100%; max-width: var(--page-max); margin: 0 auto; display: grid; gap: 8px; }
+      .x-sheet p.x-msg { margin: 0; font: var(--type-caption); color: var(--text-secondary); min-height: 1em; }
+      .x-file { display: flex; align-items: center; justify-content: center; min-height: 64px; border: 1px dashed var(--stroke-primary); border-radius: var(--r-s); background: var(--fill-tertiary); color: var(--text-secondary); font: var(--type-label); cursor: pointer; }
+      .x-vis { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+      [data-gate][readonly] { cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div class="page" id="top">
+      <main class="main">
+        <header class="x-top">
+          <div>
+            <h1 id="evTitle">Ridge Scouting · 56721K</h1>
+            <p id="evSub">Loading events…</p>
+          </div>
+          <div class="x-top__side">
+            <span class="x-save" id="saveStatus" aria-live="polite">Loading…</span>
+            <button class="x-btn" type="button" id="authBtn">Sign in</button>
+          </div>
+        </header>
 
-function renderEvSel(){
-  const list = Object.values(events).sort((a,b)=>(b.created||"").localeCompare(a.created||""));
-  $("evSel").innerHTML = list.map(e=>`<option value="${esc(e.id)}" ${e.id===cur?"selected":""}>${esc(e.name)}</option>`).join("");
-  $("evSub").textContent = ev() ? ev().us+" · "+ev().name : "";
-}
-function renderMatches(){
-  const e=ev(); const ms=(e.matches||[]).filter(m=>[...m[2],...m[3]].includes(e.us));
-  $("matchSec").classList.toggle("hidden", !ms.length);
-  $("matches").innerHTML = ms.map(m => {
-    const tm=(arr,c)=>arr.map(t=>`<span class="tm ${c} ${t===e.us?"us":""}" data-jump="${esc(t)}">${esc(t)}</span>`).join("");
-    return `<div class="card match"><div><div class="mq">${esc(m[0])}</div><div class="mt">${esc(m[1]||"")}</div></div><div class="al">${tm(m[2],"r")}<span class="vs">vs</span>${tm(m[3],"b")}</div></div>`;
-  }).join("");
-}
-function teamList(){
-  const e=ev(), data=notes[e.id]||{}, q=$("q").value.trim().toLowerCase();
-  let list = teamOrder(e).filter(t=>{ const d=data[t]||blank(); if(pickOnly&&!d.pick) return false; if(!q) return true;
-    return t.toLowerCase().includes(q)||(d.note||"").toLowerCase().includes(q)||(d.tags||[]).some(g=>g.toLowerCase().includes(q)); });
-  if (sortMode==="rating") list.sort((a,b)=>((data[b]||{}).rating||0)-((data[a]||{}).rating||0));
-  return list;
-}
-function renderTeams(){
-  const e=ev(), data=notes[e.id]||{}, dis=owner?"":"disabled";
-  $("teams").innerHTML = teamList().map(t => {
-    const d=data[t]||blank();
-    const stars=[1,2,3,4,5].map(n=>`<button class="${n<=d.rating?"on":""}" data-star="${esc(t)}" data-n="${n}">★</button>`).join("");
-    const tags=TAGS.map(g=>`<button class="pill tag ${d.tags.includes(g)?"on":""}" data-tag="${esc(t)}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
-    const when=d.updated_at?"Updated "+new Date(d.updated_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
-    return `<div class="card" id="t-${esc(t)}"><div class="th"><span class="tn">${esc(t)}</span><div class="stars">${stars}</div><div class="sp"></div><button class="pill pick ${d.pick?"on":""}" data-pick="${esc(t)}">${d.pick?"✓ Would pick":"Would pick"}</button></div>
-      <div class="nexts">${nextMatch(e,t)}</div><div class="tags">${tags}</div>
-      <textarea ${owner?"":"readonly"} data-note="${esc(t)}" placeholder="${owner?"Notes":"No notes yet"}">${esc(d.note||"")}</textarea><div class="meta">${when}</div></div>`;
-  }).join("") || `<div class="banner">No teams yet.</div>`;
-}
-function render(){ renderEvSel(); renderMatches(); renderTeams();
-  $("viewNote").classList.toggle("hidden",owner); $("addWrap").classList.toggle("hidden",!owner); $("newEv").classList.toggle("hidden",!owner);
-  $("authBtn").textContent = owner?"Sign out":"Sign in"; }
+        <div class="x-evrow">
+          <select class="x-input" id="evSel" aria-label="Event"></select>
+          <button class="x-btn" type="button" id="newEv" hidden>+ Event</button>
+        </div>
 
-function pickCur(){
-  const h = decodeURIComponent((location.hash.match(/ev=([^&]+)/)||[])[1]||"");
-  if (h && events[h]) cur=h;
-  if (!cur || !events[cur]) cur = Object.values(events).sort((a,b)=>(b.created||"").localeCompare(a.created||""))[0].id;
-}
-async function load(){
-  const { data: rows, error } = await sb.from("scout").select("*");
-  if (error){ setStatus("Can't reach cloud","err"); return false; }
-  rows.forEach(ingest);
-  if (!Object.keys(events).length) events[DEFAULT_EV.id] = {...DEFAULT_EV};
-  pickCur(); setStatus(owner?"Editing":"Live","ok"); render(); return true;
-}
+        <section aria-labelledby="m-h" id="matchSec">
+          <p class="x-label" id="m-h">Our matches</p>
+          <div class="x-strip" id="strip"></div>
+        </section>
 
-async function saveMeta(id){
-  const m={...events[id]}; delete m.saved; delete m.id;
-  const { error } = await sb.from("scout").upsert({team:"ev:"+id, data:m, updated_at:new Date().toISOString()});
-  if (!error) events[id].saved=true; return error;
-}
-function queueSave(t){
-  if (!owner) return; const id=cur, key=id+":"+t; setStatus("Saving…"); clearTimeout(timers[key]);
-  timers[key]=setTimeout(async()=>{
-    if (!events[id].saved){ const er=await saveMeta(id); if(er){ setStatus("Not saved, retrying","err"); setTimeout(()=>queueSave(t),3000); return; } }
-    const d={...notes[id][t]}; delete d.updated_at;
-    const { error } = await sb.from("scout").upsert({team:`t:${id}:${t}`, data:d, updated_at:new Date().toISOString()});
-    delete timers[key];
-    if (error){ setStatus("Not saved, retrying","err"); setTimeout(()=>queueSave(t),3000); } else setStatus("Saved","ok");
-  },500);
-}
-function edit(t,fn){ const n=notes[cur]=notes[cur]||{}; n[t]=n[t]||blank(); fn(n[t]); queueSave(t); }
+        <section aria-labelledby="t-h">
+          <div class="x-tools">
+            <p class="x-label" id="t-h" style="margin:0">Teams</p>
+            <input class="x-input" id="search" type="search" placeholder="Filter by team or tag" autocomplete="off" aria-label="Filter by team number or tag" />
+            <div class="x-sortrow">
+              <div class="x-seg" role="group" aria-label="Sort teams" id="sort">
+                <button type="button" data-sort="next" aria-pressed="true">Next match</button>
+                <button type="button" data-sort="num" aria-pressed="false">Number</button>
+                <button type="button" data-sort="rating" aria-pressed="false">Rating</button>
+              </div>
+              <span class="x-count" id="count"></span>
+            </div>
+          </div>
+          <div class="x-teams" id="teams"></div>
+          <p class="x-empty" id="empty" hidden>No teams match that filter.</p>
+          <form class="x-row" id="addForm" style="margin-top:12px" autocomplete="off">
+            <input class="x-input" id="addInput" data-gate placeholder="Add team, e.g. 1234A" aria-label="Add team number" autocapitalize="characters" />
+            <button class="x-btn" type="submit">Add team</button>
+          </form>
+        </section>
+      </main>
+    </div>
 
-document.addEventListener("click", e => {
-  const el=e.target.closest("button,[data-jump]"); if(!el) return;
-  if (el.dataset.jump){ const c=$("t-"+el.dataset.jump); if(c) c.scrollIntoView({behavior:"smooth",block:"center"}); return; }
-  if (!owner){ if(el.dataset.star||el.dataset.tag||el.dataset.pick) $("authBtn").click(); return; }
-  if (el.dataset.star){ const t=el.dataset.star,n=+el.dataset.n; edit(t,d=>d.rating=d.rating===n?0:n); renderTeams(); }
-  else if (el.dataset.tag){ const t=el.dataset.tag,g=el.dataset.g; edit(t,d=>d.tags=d.tags.includes(g)?d.tags.filter(x=>x!==g):[...d.tags,g]); renderTeams(); }
-  else if (el.dataset.pick){ const t=el.dataset.pick; edit(t,d=>d.pick=!d.pick); renderTeams(); }
-});
-document.addEventListener("input", e => { const t=e.target.dataset.note; if(t&&owner) edit(t,d=>d.note=e.target.value); });
-$("q").oninput=renderTeams;
-$("evSel").onchange=()=>{ cur=$("evSel").value; location.hash="ev="+encodeURIComponent(cur); render(); };
-$("sortBtn").onclick=()=>{ sortMode=sortMode==="schedule"?"rating":"schedule"; $("sortBtn").textContent="Sort: "+sortMode; renderTeams(); };
-$("pickOnly").onclick=()=>{ pickOnly=!pickOnly; $("pickOnly").classList.toggle("on",pickOnly); renderTeams(); };
-$("addTeam").onclick=()=>{ const t=$("newTeam").value.toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8); if(!t) return; edit(t,()=>{}); $("newTeam").value=""; renderTeams(); };
+    <div class="x-bar" role="region" aria-label="Export">
+      <div class="x-bar__in">
+        <div class="x-row">
+          <button class="x-btn x-btn--solid" type="button" id="copyAll">Copy all notes</button>
+          <button class="x-btn" type="button" id="showText">Show as text</button>
+        </div>
+        <p id="notice">Loading notes from the cloud…</p>
+      </div>
+    </div>
 
-// ---------- new event + photo reading ----------
-const TEAM_RE=/\b\d{1,5}[A-Z]\b/g;
-function fixOcr(line){ return line.toUpperCase()
-  .replace(/(\d)O(?=\d)/g,"$10").replace(/\bO(?=\d)/g,"0")
-  .replace(/\b(\d{3,5})[)\]]/g,"$1J").replace(/\b(\d{3,5})[|!]/g,"$1I").replace(/[|]/g," "); }
-// Reads VEX Via / RobotEvents style schedules. Handles both layouts:
-//  one line per match (Q8 10:11 AM r1 r2 b1 b2) and stacked rows
-//  (Q8 r1 UND b1 / 10:11 AM r2 b2), where each line's first team is red, last is blue.
-function parseText(text){
-  const raw=text.split(/\n+/).filter(l=>l.trim()), lines=raw.map(fixOcr);
-  const teams=new Set(), matches=[]; let us="", name="", m=null;
-  const flush=()=>{ if(m && (m[2].length||m[3].length)) matches.push(m); m=null; };
-  lines.forEach((line,i)=>{
-    const ts=line.match(TEAM_RE)||[];
-    const hdr=line.match(/(\d{1,5}[A-Z])\s*[-–]\s*[A-Z]{2,}/); if(hdr && !us) { us=hdr[1]; return; }
-    const at=raw[i].match(/^\s*@\s*(.+)$/); if(at && !name){ name=at[1].trim(); return; }
-    ts.forEach(t=>teams.add(t));
-    const q=line.match(/\b(QF|SF|R16|F|Q|QUAL(?:IFICATION|IFIER)?)\s*#?\s*(\d{1,3})\b(?!:)/);
-    const tm=line.match(/\b(\d{1,2}:\d{2})\s*(AM|PM)?/);
-    if(q){ flush(); m=[(q[1].startsWith("QUAL")?"Q":q[1])+q[2], tm?tm[1]+(tm[2]?" "+tm[2]:""):"", [], []];
-      if(ts.length>=4){ const h=Math.ceil(ts.length/2); m[2]=ts.slice(0,h); m[3]=ts.slice(h); flush(); return; } }
-    else if(!m) return;
-    if(!m[1] && tm) m[1]=tm[1]+(tm[2]?" "+tm[2]:"");
-    if(ts.length===1) m[2].push(ts[0]);
-    else if(ts.length>=2){ m[2].push(ts[0]); m[3].push(ts[ts.length-1]); }
-    if(m[2].length>=2 && m[3].length>=2) flush();
-  });
-  flush();
-  return {matches, teams:[...teams], us, name};
-}
-// make phone screenshots (light text on dark) readable: grayscale, invert if dark, upscale 2x
-function prep(file){ return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{
-  const k=img.width<1400?2:1, c=document.createElement("canvas"); c.width=img.width*k; c.height=img.height*k;
-  const x=c.getContext("2d"); x.drawImage(img,0,0,c.width,c.height); const d=x.getImageData(0,0,c.width,c.height), p=d.data;
-  let sum=0; for(let i=0;i<p.length;i+=4){ const g=.299*p[i]+.587*p[i+1]+.114*p[i+2]; p[i]=p[i+1]=p[i+2]=g; sum+=g; }
-  if(sum/(p.length/4)<128) for(let i=0;i<p.length;i+=4){ p[i]=p[i+1]=p[i+2]=255-p[i]; }
-  x.putImageData(d,0,0); c.toBlob(res,"image/png"); }; img.onerror=rej; img.src=URL.createObjectURL(file); }); }
-const fmtMatch=m=>`${m[0]} ${m[1]} | ${m[2].join(" ")} | ${m[3].join(" ")}`.replace(/\s+\|/g," |");
-function readMatchBox(){
-  return $("evMatches").value.split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
-    const parts=l.split("|"); const head=parts[0].trim().split(/\s+/); const id=head.shift()||"";
-    const toT=s=>((s||"").toUpperCase().match(TEAM_RE)||[]);
-    return [id, head.join(" "), toT(parts[1]), toT(parts[2])];
-  }).filter(m=>m[0]&&(m[2].length||m[3].length));
-}
-$("newEv").onclick=()=>{ ["evName","evMatches","evTeams"].forEach(i=>$(i).value=""); $("evMsg").textContent=""; $("ocrMsg").textContent=""; $("fileLbl").textContent="Tap to add a photo"; $("evModal").style.display="flex"; };
-$("evCancel").onclick=()=>$("evModal").style.display="none";
-$("evUs").oninput=()=>$("evUs").dataset.touched="1";
-$("evFile").onchange=async e=>{
-  const files=[...e.target.files]; if(!files.length) return;
-  for (const [i,f] of files.entries()){
-    $("ocrMsg").textContent=`Reading photo ${i+1} of ${files.length}…`;
-    try{
-      const w=await Tesseract.createWorker("eng",1,{logger:m=>{ if(m.status==="recognizing text") $("ocrMsg").textContent=`Reading photo ${i+1} of ${files.length}… ${Math.round(m.progress*100)}%`; }});
-      await w.setParameters({tessedit_pageseg_mode:"6"});
-      const r=await w.recognize(await prep(f)); await w.terminate();
-      const p=parseText(r.data.text);
-      const haveM=new Set(readMatchBox().map(m=>m[0]));
-      const addM=p.matches.filter(m=>!haveM.has(m[0])).map(fmtMatch);
-      if(addM.length) $("evMatches").value=($("evMatches").value.trim()+"\n"+addM.join("\n")).trim();
-      const tset=new Set(($("evTeams").value.toUpperCase().match(TEAM_RE)||[])); p.teams.forEach(t=>tset.add(t));
-      $("evTeams").value=[...tset].sort((a,b)=>parseInt(a)-parseInt(b)||a.localeCompare(b)).join(" ");
-      if(p.us && !$("evUs").dataset.touched) $("evUs").value=p.us;
-      if(p.name && !$("evName").value.trim()) $("evName").value=p.name;
-      $("ocrMsg").textContent=`Found ${p.matches.length} matches and ${p.teams.length} teams. Check them below.`;
-    }catch(err){ $("ocrMsg").textContent="Couldn't read that photo. Type the teams in instead."; }
+    <div class="x-sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="x-sheet__head">
+        <h2 id="sheetTitle">All notes</h2>
+        <button class="x-btn" type="button" id="sheetCopy">Copy</button>
+        <button class="x-btn x-btn--solid" type="button" id="sheetClose">Close</button>
+      </div>
+      <textarea id="sheetText" readonly aria-label="All notes as plain text"></textarea>
+    </div>
+
+    <div class="x-sheet x-sheet--sm" id="authSheet" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="x-sheet__in">
+        <div class="x-sheet__head">
+          <h2 id="authTitle">Sign in to edit</h2>
+          <button class="x-btn" type="button" id="authClose">Close</button>
+        </div>
+        <div id="step1" class="x-sheet__in">
+          <p class="x-msg">Anyone can view. Only Archer's account can edit. We'll email you a sign-in link.</p>
+          <input class="x-input" id="email" type="email" value="archerandorjohnson@gmail.com" autocomplete="email" aria-label="Email" />
+          <button class="x-btn x-btn--solid" type="button" id="sendCode">Email me a sign-in link</button>
+        </div>
+        <div id="step2" class="x-sheet__in" hidden>
+          <p class="x-msg">Check your email and tap the sign-in link on this device. If the email shows a code instead, type it here.</p>
+          <div class="x-row">
+            <input class="x-input" id="code" inputmode="numeric" autocomplete="one-time-code" placeholder="Code" aria-label="Sign-in code" />
+            <button class="x-btn x-btn--solid" type="button" id="verify">Sign in</button>
+          </div>
+        </div>
+        <p class="x-msg" id="authMsg"></p>
+      </div>
+    </div>
+
+    <div class="x-sheet x-sheet--scroll" id="evSheet" hidden role="dialog" aria-modal="true" aria-labelledby="evTitleH">
+      <div class="x-sheet__in">
+        <div class="x-sheet__head">
+          <h2 id="evTitleH">New event</h2>
+          <button class="x-btn" type="button" id="evCancel">Cancel</button>
+          <button class="x-btn x-btn--solid" type="button" id="evSave">Create</button>
+        </div>
+        <p class="x-label" style="margin:0">Event name</p>
+        <input class="x-input" id="evName" placeholder="e.g. Grand Forks Dec 12" />
+        <p class="x-label" style="margin:0">Our team</p>
+        <input class="x-input" id="evUs" value="56721K" autocapitalize="characters" />
+        <p class="x-label" style="margin:0">Schedule or team list photos (optional)</p>
+        <label class="x-file" for="evFile" id="fileLbl">Tap to add a photo</label>
+        <input class="x-vis" id="evFile" type="file" accept="image/*" multiple />
+        <p class="x-msg" id="ocrMsg"></p>
+        <p class="x-label" style="margin:0">Matches · one per line: Q8 10:11 AM | red red | blue blue</p>
+        <textarea id="evMatches" placeholder="Q8 10:11 AM | 56721K 11532D | 56549B 59936A" aria-label="Matches"></textarea>
+        <p class="x-label" style="margin:0">Teams · space or line separated</p>
+        <textarea id="evTeams" style="min-height:80px" aria-label="Teams"></textarea>
+        <p class="x-msg" id="evMsg"></p>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="hark.js"></script>
+    <script>
+(function () {
+  var SUPA_URL = "https://mtcfiumybawwwcioawyv.supabase.co";
+  var SUPA_KEY = "sb_publishable_Z_WT3N7VKT3wGLj0slXaaA_ndnqSf5P";
+  var OWNER = "archerandorjohnson@gmail.com";
+  var DEFAULT_EV = { id: "fisher-2026", name: "Fisher · Nov 14, 2026", us: "56721K", date: "2026-11-14",
+    sub: "Fisher Robotics VEX V5 · Sat Nov 14, 2026", created: "Sat 2026-11-14 2:00 AM CST (UTC-06:00)", teams: [], matches: [
+    ["Q8", "10:11 AM", ["56721K", "11532D"], ["56549B", "59936A"], "UND"],
+    ["Q16", "10:50 AM", ["9821G", "56721A"], ["81207F", "56721K"], "UND"],
+    ["Q21", "11:15 AM", ["56549E", "56721K"], ["11532J", "9821F"], "Fisher"],
+    ["Q39", "12:45 PM", ["96671H", "30029B"], ["56721K", "5450C"], "Fisher"],
+    ["Q48", "1:30 PM", ["56721K", "5450D"], ["11532R", "1532C"], "UND"],
+    ["Q55", "2:05 PM", ["11532H", "11532A"], ["56721K", "56549A"], "Fisher"],
+    ["Q64", "2:50 PM", ["81207E", "59936B"], ["9821A", "56721K"], "UND"]
+  ]};
+  var GROUPS = [
+    { name: "Drive", tags: ["Tank", "X-drive/holonomic", "Fast", "Slow", "Pushy/strong"] },
+    { name: "Mechanism", tags: ["Claw bot", "Intake", "Lift", "DR4B", "Cascade lift", "Linear slide", "Pneumatics", "Roller"] },
+    { name: "Play", tags: ["Auton works", "No auton", "Good driver", "Defense bot", "Scores a lot", "Breaks down", "Tips over"] }
+  ];
+  var TAG_ORDER = [].concat.apply([], GROUPS.map(function (g) { return g.tags; }));
+  var $ = function (id) { return document.getElementById(id); };
+
+  var sb = null;
+  try {
+    sb = supabase.createClient(SUPA_URL, SUPA_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" } });
+  } catch (e) { sb = null; }
+
+  // ---------- data ----------
+  var events = {};   // id -> meta
+  var notes = {};    // id -> team -> {tags,rating,pick,text,notes}
+  var cur = null, owner = false, loaded = false;
+  var US = "56721K", MATCHES = [], ORDER = [];
+  var timers = {};
+
+  function blank() { return { tags: [], rating: 0, pick: false, text: "", notes: [] }; }
+  function norm(d) {
+    d = d || {};
+    var t = blank();
+    t.tags = Array.isArray(d.tags) ? d.tags.slice() : [];
+    t.rating = +d.rating || 0;
+    t.pick = !!d.pick;
+    t.text = typeof d.text === "string" ? d.text : (typeof d.note === "string" ? d.note : "");
+    t.notes = Array.isArray(d.notes) ? d.notes.filter(function (n) { return n && typeof n.text === "string"; }) : [];
+    return t;
   }
-  $("fileLbl").textContent="Add another photo"; e.target.value="";
-};
-$("evSave").onclick=async()=>{
-  const name=$("evName").value.trim(); if(!name){ $("evMsg").textContent="Name the event first."; return; }
-  const us=($("evUs").value.toUpperCase().match(TEAM_RE)||["56721K"])[0];
-  const matches=readMatchBox();
-  const teams=[...new Set([...($("evTeams").value.toUpperCase().match(TEAM_RE)||[]), ...matches.flatMap(m=>[...m[2],...m[3]])])].filter(t=>t!==us);
-  const id=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40)+"-"+Date.now().toString(36).slice(-4);
-  events[id]={id,name,us,matches,teams,created:new Date().toISOString()};
-  $("evMsg").textContent="Saving…";
-  const er=await saveMeta(id);
-  if(er){ $("evMsg").textContent="Couldn't save: "+er.message; delete events[id]; return; }
-  $("evModal").style.display="none"; cur=id; location.hash="ev="+encodeURIComponent(id); render(); setStatus("Saved","ok");
-};
+  function ingest(r) {
+    if (!r || !r.team) return;
+    if (r.team.indexOf("ev:") === 0) {
+      var id = r.team.slice(3), m = Object.assign({}, r.data || {}, { id: id, saved: true });
+      if (id === DEFAULT_EV.id) { // fill display-only extras the saved row may lack
+        if (!m.sub) m.sub = DEFAULT_EV.sub;
+        if (!m.date) m.date = DEFAULT_EV.date;
+        (m.matches || []).forEach(function (x) {
+          if (x[4]) return;
+          var d = DEFAULT_EV.matches.filter(function (y) { return y[0] === x[0]; })[0];
+          if (d) x[4] = d[4];
+        });
+      }
+      events[id] = m;
+    } else if (r.team.indexOf("t:") === 0) {
+      var parts = r.team.split(":"), eid = parts[1], team = parts.slice(2).join(":");
+      var bag = notes[eid] = notes[eid] || {}, nd = norm(r.data);
+      if (bag[team]) Object.assign(bag[team], nd); else bag[team] = nd; // keep the object cards are bound to
+    }
+  }
+  function ev() { return events[cur]; }
+  function newest(a, b) { var ka = (evDate(a) || "") + "|" + (a.created || ""), kb = (evDate(b) || "") + "|" + (b.created || ""); return kb.localeCompare(ka); }
+  function teamsOf(id) { return notes[id] = notes[id] || {}; }
 
-// ---------- auth ----------
-const modal=$("modal");
-$("authBtn").onclick=async()=>{ if(owner){ await sb.auth.signOut(); return; } $("step1").classList.remove("hidden"); $("step2").classList.add("hidden"); $("authMsg").textContent=""; modal.style.display="flex"; };
-$("cancel1").onclick=$("cancel2").onclick=()=>modal.style.display="none";
-$("sendCode").onclick=async()=>{ $("authMsg").textContent="Sending…";
-  const { error }=await sb.auth.signInWithOtp({email:$("email").value.trim(),options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});
-  if(error){ $("authMsg").textContent=error.message; return; }
-  $("authMsg").textContent=""; $("step1").classList.add("hidden"); $("step2").classList.remove("hidden"); $("code").focus(); };
-$("verify").onclick=async()=>{ $("authMsg").textContent="Checking…";
-  const { error }=await sb.auth.verifyOtp({email:$("email").value.trim(),token:$("code").value.trim(),type:"email"});
-  if(error){ $("authMsg").textContent=error.message; return; } modal.style.display="none"; };
-sb.auth.onAuthStateChange((_e,session)=>{ owner=!!(session&&session.user&&(session.user.email||"").toLowerCase()===OWNER);
-  setStatus(owner?"Editing":"Live","ok"); if(cur) render(); });
+  function mins(t) {
+    var m = String(t || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (!m) return -1;
+    var h = +m[1];
+    if (m[3]) h = h % 12 + (m[3].toUpperCase() === "PM" ? 12 : 0);
+    return h * 60 + +m[2];
+  }
+  function evDate(e) {
+    if (e.date) return e.date;
+    var m = String(e.created || "").match(/\d{4}-\d{2}-\d{2}/);
+    if (!m) return "";
+    if (/T/.test(e.created)) { var d = new Date(e.created); if (!isNaN(d)) return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+    return m[0];
+  }
+  function setupEvent() {
+    var e = ev();
+    US = e.us || "56721K";
+    MATCHES = (e.matches || []).filter(function (m) { return (m[2] || []).concat(m[3] || []).indexOf(US) > -1; }).map(function (m, i) {
+      return { q: m[0], time: m[1] || "", field: m[4] || "", red: m[2] || [], blue: m[3] || [], i: i, min: mins(m[1]) };
+    });
+    var o = [];
+    MATCHES.forEach(function (m) { m.red.concat(m.blue).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); }); });
+    (e.matches || []).forEach(function (m) { (m[2] || []).concat(m[3] || []).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); }); });
+    (e.teams || []).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); });
+    Object.keys(teamsOf(e.id)).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); });
+    ORDER = o;
+    ORDER.forEach(function (t) { if (!teamsOf(e.id)[t]) teamsOf(e.id)[t] = blank(); });
+  }
+  function T(num) { return teamsOf(cur)[num]; }
 
-// ---------- live updates ----------
-sb.channel("scout").on("postgres_changes",{event:"*",schema:"public",table:"scout"},p=>{
-  const r=p.new; if(!r||!r.team) return;
-  if (r.team.startsWith("t:")){ const [,id,...rest]=r.team.split(":"); if(owner&&timers[id+":"+rest.join(":")]) return; }
-  ingest(r); if(!events[cur]) pickCur();
-  if(!(owner&&document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.note)) render(); else renderEvSel();
-}).subscribe();
-setInterval(()=>{ if(!owner) load(); },20000);
-window.addEventListener("hashchange",()=>{ pickCur(); render(); });
-load();
-</script>
-</body>
+  function withUs(num) {
+    var out = [];
+    MATCHES.forEach(function (m) {
+      var inRed = m.red.indexOf(num) > -1, inBlue = m.blue.indexOf(num) > -1;
+      if (!inRed && !inBlue) return;
+      var usRed = m.red.indexOf(US) > -1;
+      out.push({ m: m, role: (inRed === usRed) ? "partner" : "opponent" });
+    });
+    return out;
+  }
+  function hasNotes(t) { return t.tags.length || t.rating || t.pick || t.text.trim() || t.notes.length; }
+
+  // ---------- save status ----------
+  function setSave(txt, cls) { var s = $("saveStatus"); s.textContent = txt; s.className = "x-save" + (cls ? " " + cls : ""); }
+  function idleStatus() {
+    if (!loaded) return;
+    if (owner) { if (!Object.keys(timers).length) setSave("Saved", "is-ok"); }
+    else setSave("View only");
+  }
+  function paintAuth() {
+    $("authBtn").textContent = owner ? "Sign out" : "Sign in";
+    $("newEv").hidden = !owner;
+    [].forEach.call(document.querySelectorAll("[data-gate]"), function (el) { if (owner) el.removeAttribute("readonly"); else el.setAttribute("readonly", ""); });
+    $("notice").textContent = owner ? "Signed in. Every change saves to the cloud for the whole team." : "View only. Updates live. Tap any control to sign in and edit.";
+    idleStatus();
+  }
+
+  // ---------- gate: viewers get the sign-in sheet ----------
+  function gate() { if (owner) return true; openAuth(); return false; }
+  document.addEventListener("focusin", function (e) {
+    var el = e.target;
+    if (!owner && el && el.hasAttribute && el.hasAttribute("data-gate")) { el.blur(); openAuth(); }
+  });
+
+  // ---------- saving ----------
+  function saveMeta(id) {
+    var m = Object.assign({}, events[id]); delete m.saved; delete m.id;
+    return sb.from("scout").upsert({ team: "ev:" + id, data: m, updated_at: new Date().toISOString() }).then(function (r) {
+      if (!r.error) events[id].saved = true;
+      return r.error;
+    });
+  }
+  function queueSave(num) {
+    if (!owner || !sb) return;
+    var id = cur, key = id + ":" + num;
+    setSave("Saving…");
+    clearTimeout(timers[key]);
+    timers[key] = setTimeout(function run() {
+      var p = events[id].saved ? Promise.resolve(null) : saveMeta(id);
+      p.then(function (er) {
+        if (er) throw er;
+        var d = teamsOf(id)[num];
+        return sb.from("scout").upsert({ team: "t:" + id + ":" + num, data: { tags: d.tags, rating: d.rating, pick: d.pick, text: d.text, notes: d.notes }, updated_at: new Date().toISOString() });
+      }).then(function (r) {
+        if (r && r.error) throw r.error;
+        delete timers[key];
+        idleStatus();
+      }).catch(function () {
+        setSave("Not saved · retrying", "is-err");
+        timers[key] = setTimeout(run, 3000);
+      });
+    }, 500);
+  }
+
+  // ---------- matches strip ----------
+  var strip = $("strip");
+  function nextMatchIndex() {
+    var d = evDate(ev()), now = new Date();
+    var today = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+    if (d && d !== today) return -1;
+    var c = now.getHours() * 60 + now.getMinutes();
+    for (var i = 0; i < MATCHES.length; i++) if (MATCHES[i].min >= 0 && MATCHES[i].min + 3 >= c) return i;
+    return -1;
+  }
+  function teamBtn(num, usRed, isRed) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "x-team";
+    var role = num === US ? "us" : (isRed === usRed ? "partner" : "opponent");
+    b.innerHTML = esc(num) + "<small>" + role + "</small>";
+    if (num === US) { b.className += " is-us"; b.disabled = true; b.setAttribute("aria-label", num + ", our team"); }
+    else {
+      b.dataset.team = num;
+      b.setAttribute("aria-label", num + ", " + role + ". Open notes");
+      b.addEventListener("click", function () { jumpTo(num); });
+    }
+    return b;
+  }
+  function renderStrip() {
+    strip.innerHTML = "";
+    $("matchSec").hidden = !MATCHES.length;
+    var nx = nextMatchIndex();
+    MATCHES.forEach(function (m) {
+      var usRed = m.red.indexOf(US) > -1;
+      var card = document.createElement("div");
+      card.className = "x-match" + (m.i === nx ? " is-next" : "");
+      var info = [m.time, m.field].filter(Boolean).join(" · ") + (m.i === nx ? " · next" : "");
+      card.innerHTML = '<div class="x-match__head">' + esc(m.q) + " <span>" + esc(info) + "</span></div>";
+      [["red", m.red], ["blue", m.blue]].forEach(function (pair) {
+        var row = document.createElement("div");
+        row.className = "x-all x-all--" + pair[0];
+        row.innerHTML = '<span class="x-all__side">' + (pair[0] === "red" ? "Red" : "Blue") + "</span>";
+        pair[1].forEach(function (n) { row.appendChild(teamBtn(n, usRed, pair[0] === "red")); });
+        card.appendChild(row);
+      });
+      strip.appendChild(card);
+    });
+    if (nx > 0) strip.scrollLeft = strip.children[nx].offsetLeft - strip.children[0].offsetLeft;
+    refreshDots();
+  }
+  function refreshDots() {
+    [].forEach.call(strip.querySelectorAll(".x-team[data-team]"), function (b) {
+      var t = T(b.dataset.team);
+      b.classList.toggle("has-notes", !!(t && hasNotes(t)));
+    });
+  }
+
+  // ---------- team cards ----------
+  var list = $("teams");
+  var cards = {};
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function starsHtml(r) { var s = ""; for (var i = 1; i <= 5; i++) s += i <= r ? "★" : '<span class="off">☆</span>'; return s; }
+  function nowStamp() {
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    return (h % 12 || 12) + ":" + (m < 10 ? "0" : "") + m + " " + (h < 12 ? "AM" : "PM");
+  }
+  function grow(a) { a.style.height = "auto"; a.style.height = a.scrollHeight + 2 + "px"; }
+
+  function buildCard(num) {
+    var t = T(num);
+    var el = document.createElement("article");
+    el.className = "x-card";
+    el.id = "team-" + num;
+    var sum = document.createElement("button");
+    sum.type = "button";
+    sum.className = "x-card__sum";
+    sum.setAttribute("aria-expanded", "false");
+    var body = document.createElement("div");
+    body.className = "x-card__body";
+    body.hidden = true;
+
+    GROUPS.forEach(function (g) {
+      var grp = document.createElement("div");
+      grp.className = "x-group";
+      grp.innerHTML = '<p class="x-label" style="margin:0">' + g.name + "</p>";
+      var wrap = document.createElement("div");
+      wrap.className = "x-toggles";
+      g.tags.forEach(function (tag) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "x-tog";
+        b.textContent = tag;
+        b.setAttribute("aria-pressed", t.tags.indexOf(tag) > -1 ? "true" : "false");
+        b.addEventListener("click", function () {
+          if (!gate()) return;
+          var i = t.tags.indexOf(tag);
+          if (i > -1) t.tags.splice(i, 1); else t.tags.push(tag);
+          t.tags.sort(function (a, b2) { return TAG_ORDER.indexOf(a) - TAG_ORDER.indexOf(b2); });
+          b.setAttribute("aria-pressed", i > -1 ? "false" : "true");
+          changed(num);
+        });
+        wrap.appendChild(b);
+      });
+      grp.appendChild(wrap);
+      body.appendChild(grp);
+    });
+
+    var rgrp = document.createElement("div");
+    rgrp.className = "x-group";
+    rgrp.innerHTML = '<p class="x-label" style="margin:0">Rating</p>';
+    var rate = document.createElement("div");
+    rate.className = "x-rate";
+    var starBtns = [];
+    for (var i = 1; i <= 5; i++) (function (v) {
+      var s = document.createElement("button");
+      s.type = "button";
+      s.className = "x-star";
+      s.textContent = "★";
+      s.setAttribute("aria-label", v + " star" + (v > 1 ? "s" : ""));
+      s.addEventListener("click", function () {
+        if (!gate()) return;
+        t.rating = t.rating === v ? 0 : v;
+        paintStars();
+        changed(num);
+      });
+      starBtns.push(s);
+      rate.appendChild(s);
+    })(i);
+    function paintStars() {
+      starBtns.forEach(function (s, k) {
+        s.classList.toggle("is-on", k < t.rating);
+        s.textContent = k < t.rating ? "★" : "☆";
+        s.setAttribute("aria-pressed", k + 1 === t.rating ? "true" : "false");
+      });
+    }
+    paintStars();
+    var pick = document.createElement("button");
+    pick.type = "button";
+    pick.className = "x-tog";
+    pick.textContent = "Would pick as partner";
+    pick.setAttribute("aria-pressed", t.pick ? "true" : "false");
+    pick.addEventListener("click", function () {
+      if (!gate()) return;
+      t.pick = !t.pick;
+      pick.setAttribute("aria-pressed", t.pick ? "true" : "false");
+      changed(num);
+    });
+    rate.appendChild(pick);
+    rgrp.appendChild(rate);
+    body.appendChild(rgrp);
+
+    var qgrp = document.createElement("div");
+    qgrp.className = "x-group";
+    qgrp.innerHTML = '<p class="x-label" style="margin:0">Quick notes</p>';
+    var qform = document.createElement("form");
+    qform.className = "x-row";
+    qform.setAttribute("autocomplete", "off");
+    var qin = document.createElement("input");
+    qin.className = "x-input";
+    qin.setAttribute("data-gate", "");
+    if (!owner) qin.setAttribute("readonly", "");
+    qin.placeholder = "e.g. intake jammed in Q8, then Enter";
+    qin.setAttribute("aria-label", "Quick note for " + num);
+    qin.setAttribute("enterkeyhint", "done");
+    var qbtn = document.createElement("button");
+    qbtn.type = "submit";
+    qbtn.className = "x-btn";
+    qbtn.textContent = "Add";
+    qform.appendChild(qin);
+    qform.appendChild(qbtn);
+    var ul = document.createElement("ul");
+    ul.className = "x-notes";
+    function paintNotes() {
+      ul.innerHTML = "";
+      t.notes.forEach(function (n, k) {
+        var li = document.createElement("li");
+        li.innerHTML = "<span><time>" + esc(n.t || "") + "</time> – " + esc(n.text) + "</span>";
+        var d = document.createElement("button");
+        d.type = "button";
+        d.className = "x-del";
+        d.textContent = "×";
+        d.setAttribute("aria-label", "Delete note");
+        d.addEventListener("click", function () { if (!gate()) return; t.notes.splice(k, 1); paintNotes(); changed(num); });
+        li.appendChild(d);
+        ul.appendChild(li);
+      });
+    }
+    paintNotes();
+    qform.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!gate()) return;
+      var v = qin.value.trim();
+      if (!v) return;
+      t.notes.unshift({ t: nowStamp(), text: v });
+      qin.value = "";
+      paintNotes();
+      changed(num);
+      qin.focus();
+    });
+    qgrp.appendChild(qform);
+    qgrp.appendChild(ul);
+    body.appendChild(qgrp);
+
+    var fgrp = document.createElement("div");
+    fgrp.className = "x-group";
+    fgrp.innerHTML = '<p class="x-label" style="margin:0">Notes</p>';
+    var area = document.createElement("textarea");
+    area.className = "x-area";
+    area.rows = 2;
+    area.setAttribute("data-gate", "");
+    if (!owner) area.setAttribute("readonly", "");
+    area.placeholder = "Anything else about " + num;
+    area.setAttribute("aria-label", "Notes for " + num);
+    area.value = t.text;
+    area.addEventListener("input", function () { if (!owner) return; t.text = area.value; grow(area); changed(num); });
+    fgrp.appendChild(area);
+    body.appendChild(fgrp);
+
+    sum.addEventListener("click", function () { setOpen(num, body.hidden); });
+    el.appendChild(sum);
+    el.appendChild(body);
+    cards[num] = { el: el, sum: sum, body: body, area: area, qin: qin };
+    paintSum(num);
+    return el;
+  }
+
+  function paintSum(num) {
+    var t = T(num), c = cards[num];
+    var mm = withUs(num).map(function (x) { return x.m.q + " " + x.role; }).join(" · ");
+    var tags = t.tags.map(function (g) { return '<span class="chip">' + esc(g) + "</span>"; }).join("");
+    c.sum.innerHTML =
+      '<span class="x-card__num">' + esc(num) + (t.pick ? ' <span class="dot" style="margin:0">Pick</span>' : "") + "</span>" +
+      '<span class="x-card__stars" aria-label="' + (t.rating ? t.rating + " of 5 stars" : "Not rated") + '">' + starsHtml(t.rating) + "</span>" +
+      '<span class="x-card__meta">' + esc(mm || "Not in our matches") + (t.notes.length ? " · " + t.notes.length + " note" + (t.notes.length > 1 ? "s" : "") : "") + "</span>" +
+      '<span class="x-card__tags">' + tags + "</span>";
+  }
+  function setOpen(num, open) {
+    var c = cards[num];
+    c.body.hidden = !open;
+    c.sum.setAttribute("aria-expanded", open ? "true" : "false");
+    if (open) grow(c.area);
+  }
+  function changed(num) {
+    paintSum(num);
+    refreshDots();
+    queueSave(num);
+    if (query) applyFilter();
+  }
+  // replace one card after a remote change, keeping it open if it was
+  function refreshCard(num) {
+    var old = cards[num];
+    if (!old) return;
+    if (old.el.contains(document.activeElement)) { paintSum(num); return; }
+    var open = !old.body.hidden;
+    var el = buildCard(num);
+    old.el.parentNode.replaceChild(el, old.el);
+    if (open) setOpen(num, true);
+  }
+
+  function addTeam(raw) {
+    var num = raw.trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+    if (!num || num === US) return null;
+    if (!T(num)) {
+      teamsOf(cur)[num] = blank();
+      ORDER.push(num);
+      list.appendChild(buildCard(num));
+      queueSave(num);
+      sortCards();
+    }
+    return num;
+  }
+
+  // ---------- sort & filter ----------
+  var sortMode = "next", query = "";
+  function nextKey(num) {
+    var ms = withUs(num);
+    if (!ms.length) return 1000;
+    var nx = nextMatchIndex();
+    var up = ms.filter(function (x) { return nx < 0 || x.m.i >= nx; });
+    return up.length ? up[0].m.i : 100 + ms[0].m.i;
+  }
+  function cmpNum(a, b) {
+    var na = parseInt(a, 10) || 0, nb = parseInt(b, 10) || 0;
+    return na - nb || (a < b ? -1 : a > b ? 1 : 0);
+  }
+  function sortCards() {
+    var arr = ORDER.slice();
+    arr.sort(function (a, b) {
+      if (sortMode === "num") return cmpNum(a, b);
+      if (sortMode === "rating") return (T(b).rating - T(a).rating) || (T(b).pick - T(a).pick) || cmpNum(a, b);
+      return nextKey(a) - nextKey(b) || ORDER.indexOf(a) - ORDER.indexOf(b);
+    });
+    arr.forEach(function (n) { if (cards[n]) list.appendChild(cards[n].el); });
+  }
+  function applyFilter() {
+    var q = query.toLowerCase(), shown = 0;
+    ORDER.forEach(function (n) {
+      var t = T(n);
+      var hit = !q || n.toLowerCase().indexOf(q) > -1 ||
+        t.tags.some(function (g) { return g.toLowerCase().indexOf(q) > -1; }) ||
+        (t.pick && "pick".indexOf(q) === 0);
+      cards[n].el.hidden = !hit;
+      if (hit) shown++;
+    });
+    $("empty").hidden = shown > 0;
+    $("empty").textContent = ORDER.length ? "No teams match that filter." : "No teams yet.";
+    $("count").textContent = shown + (shown === ORDER.length ? " teams" : " of " + ORDER.length);
+  }
+  function jumpTo(num) {
+    if (!cards[num]) return;
+    if (cards[num].el.hidden) { query = ""; search.value = ""; applyFilter(); }
+    setOpen(num, true);
+    var el = cards[num].el;
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    el.classList.add("is-flash");
+    setTimeout(function () { el.classList.remove("is-flash"); }, 1200);
+    if (owner) setTimeout(function () { try { cards[num].qin.focus({ preventScroll: true }); } catch (e) {} }, 350);
+  }
+
+  // ---------- render ----------
+  function titleOf(e) { return String(e.name).split(" · ")[0] + " Scouting · " + e.us + (e.us === "56721K" ? " RIDGE" : ""); }
+  function renderEvSel() {
+    var arr = Object.keys(events).map(function (k) { return events[k]; }).sort(newest);
+    $("evSel").innerHTML = arr.map(function (e) { return '<option value="' + esc(e.id) + '"' + (e.id === cur ? " selected" : "") + ">" + esc(e.name) + "</option>"; }).join("");
+    var e = ev();
+    if (e) {
+      $("evTitle").textContent = titleOf(e);
+      $("evSub").textContent = e.sub || ("VEX V5 · " + (evDate(e) || e.name));
+      document.title = e.name + " Scouting";
+    }
+  }
+  function renderAll() {
+    setupEvent();
+    renderEvSel();
+    list.innerHTML = "";
+    cards = {};
+    ORDER.forEach(function (n) { list.appendChild(buildCard(n)); });
+    renderStrip();
+    sortCards();
+    applyFilter();
+  }
+  function pickCur() {
+    var h = decodeURIComponent((location.hash.match(/ev=([^&]+)/) || [])[1] || "");
+    if (h && events[h]) cur = h;
+    if (!cur || !events[cur]) {
+      cur = Object.keys(events).map(function (k) { return events[k]; }).sort(newest)[0].id;
+    }
+  }
+  function snapshot(id) { return JSON.stringify(notes[id] || {}); }
+  function load() {
+    if (!sb) {
+      if (!loaded) { events[DEFAULT_EV.id] = Object.assign({}, DEFAULT_EV, { saved: false }); pickCur(); loaded = true; renderAll(); }
+      setSave("Offline", "is-err"); return Promise.resolve(false);
+    }
+    return sb.from("scout").select("*").then(function (r) {
+      if (r.error) throw r.error;
+      var before = cur ? snapshot(cur) : null, evBefore = cur && events[cur] ? JSON.stringify(events[cur]) : null;
+      var prevCards = cur ? JSON.parse(before) : {};
+      r.data.forEach(ingest);
+      if (!events[DEFAULT_EV.id] && !Object.keys(events).length) events[DEFAULT_EV.id] = Object.assign({}, DEFAULT_EV);
+      var prev = cur;
+      pickCur();
+      if (!loaded || prev !== cur || JSON.stringify(events[cur]) !== evBefore) { loaded = true; renderAll(); }
+      else if (snapshot(cur) !== before) {
+        var now = notes[cur] || {};
+        Object.keys(now).forEach(function (n) {
+          if (JSON.stringify(now[n]) === JSON.stringify(prevCards[n])) return;
+          if (cards[n]) refreshCard(n); else { if (ORDER.indexOf(n) < 0) ORDER.push(n); list.appendChild(buildCard(n)); }
+        });
+        refreshDots(); applyFilter();
+      }
+      idleStatus();
+      return true;
+    }).catch(function () {
+      if (!loaded) {
+        events[DEFAULT_EV.id] = Object.assign({}, DEFAULT_EV, { saved: false });
+        pickCur(); loaded = true; renderAll();
+      }
+      setSave("Can't reach cloud", "is-err");
+      return false;
+    });
+  }
+
+  // ---------- export ----------
+  function exportText() {
+    var e = ev();
+    var lines = [titleOf(e), e.sub || e.name, ""];
+    var arr = ORDER.slice().sort(cmpNum);
+    arr.forEach(function (n) {
+      var t = T(n);
+      var ms = withUs(n).map(function (x) { return x.m.q + " " + x.role; }).join(", ");
+      lines.push("== " + n + (ms ? " (" + ms + ")" : "") + " ==");
+      lines.push("Rating: " + (t.rating ? t.rating + "/5" : "not rated") + (t.pick ? " · Would pick as partner" : ""));
+      lines.push("Tags: " + (t.tags.length ? t.tags.join(", ") : "none"));
+      if (t.text.trim()) lines.push("Notes: " + t.text.trim());
+      t.notes.forEach(function (q) { lines.push("- " + q.t + " – " + q.text); });
+      lines.push("");
+    });
+    return lines.join("\n");
+  }
+  var sheet = $("sheet"), sheetText = $("sheetText");
+  function openSheet() {
+    sheetText.value = exportText();
+    sheet.hidden = false;
+    document.body.style.overflow = "hidden";
+    setTimeout(function () { try { sheetText.focus(); sheetText.select(); } catch (e) {} }, 30);
+  }
+  function closeSheet() { sheet.hidden = true; document.body.style.overflow = ""; }
+  function flash(btn, msg) {
+    var old = btn.dataset.label || btn.textContent;
+    btn.dataset.label = old;
+    btn.textContent = msg;
+    clearTimeout(btn._t);
+    btn._t = setTimeout(function () { btn.textContent = old; }, 1800);
+  }
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0"; ta.style.top = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+  function copyAll(btn) {
+    var text = exportText();
+    function fail() {
+      if (legacyCopy(text)) { flash(btn, "Copied"); return; }
+      flash(btn, "Select and copy");
+      openSheet();
+    }
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(function () { flash(btn, "Copied"); }, fail);
+      else fail();
+    } catch (e) { fail(); }
+  }
+
+  // ---------- sign-in sheet ----------
+  var authSheet = $("authSheet");
+  function openAuth() {
+    if (!authSheet.hidden) return;
+    $("step1").hidden = false; $("step2").hidden = true; $("authMsg").textContent = "";
+    authSheet.hidden = false;
+  }
+  function closeAuth() { authSheet.hidden = true; }
+  $("authBtn").addEventListener("click", function () {
+    if (owner) { sb.auth.signOut(); return; }
+    openAuth();
+  });
+  $("authClose").addEventListener("click", closeAuth);
+  $("sendCode").addEventListener("click", function () {
+    if (!sb) return;
+    $("authMsg").textContent = "Sending…";
+    sb.auth.signInWithOtp({ email: $("email").value.trim(), options: { shouldCreateUser: true, emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+      if (r.error) { $("authMsg").textContent = r.error.message; return; }
+      $("authMsg").textContent = "";
+      $("step1").hidden = true; $("step2").hidden = false;
+    });
+  });
+  $("verify").addEventListener("click", function () {
+    $("authMsg").textContent = "Checking…";
+    sb.auth.verifyOtp({ email: $("email").value.trim(), token: $("code").value.trim(), type: "email" }).then(function (r) {
+      if (r.error) { $("authMsg").textContent = r.error.message; return; }
+      $("authMsg").textContent = ""; closeAuth();
+    });
+  });
+  function setOwner(session) {
+    var was = owner;
+    owner = !!(session && session.user && String(session.user.email || "").toLowerCase() === OWNER);
+    if (session && session.user && !owner) $("authMsg").textContent = "That account can view only.";
+    if (owner) closeAuth();
+    paintAuth();
+    if (was !== owner && loaded) renderAll();
+  }
+  if (sb) sb.auth.onAuthStateChange(function (_e, session) { setOwner(session); });
+
+  // ---------- new event + photo reading (tested parser, kept as is) ----------
+  var TEAM_RE = /\b\d{1,5}[A-Z]\b/g;
+  function fixOcr(line) { return line.toUpperCase()
+    .replace(/(\d)O(?=\d)/g, "$10").replace(/\bO(?=\d)/g, "0")
+    .replace(/\b(\d{3,5})[)\]]/g, "$1J").replace(/\b(\d{3,5})[|!]/g, "$1I").replace(/[|]/g, " "); }
+  function parseText(text) {
+    const raw = text.split(/\n+/).filter(l => l.trim()), lines = raw.map(fixOcr);
+    const teams = new Set(), matches = []; let us = "", name = "", m = null;
+    const flush = () => { if (m && (m[2].length || m[3].length)) matches.push(m); m = null; };
+    lines.forEach((line, i) => {
+      const ts = line.match(TEAM_RE) || [];
+      const hdr = line.match(/(\d{1,5}[A-Z])\s*[-–]\s*[A-Z]{2,}/); if (hdr && !us) { us = hdr[1]; return; }
+      const at = raw[i].match(/^\s*@\s*(.+)$/); if (at && !name) { name = at[1].trim(); return; }
+      ts.forEach(t => teams.add(t));
+      const q = line.match(/\b(QF|SF|R16|F|Q|QUAL(?:IFICATION|IFIER)?)\s*#?\s*(\d{1,3})\b(?!:)/);
+      const tm = line.match(/\b(\d{1,2}:\d{2})\s*(AM|PM)?/);
+      if (q) { flush(); m = [(q[1].startsWith("QUAL") ? "Q" : q[1]) + q[2], tm ? tm[1] + (tm[2] ? " " + tm[2] : "") : "", [], []];
+        if (ts.length >= 4) { const h = Math.ceil(ts.length / 2); m[2] = ts.slice(0, h); m[3] = ts.slice(h); flush(); return; } }
+      else if (!m) return;
+      if (!m[1] && tm) m[1] = tm[1] + (tm[2] ? " " + tm[2] : "");
+      if (ts.length === 1) m[2].push(ts[0]);
+      else if (ts.length >= 2) { m[2].push(ts[0]); m[3].push(ts[ts.length - 1]); }
+      if (m[2].length >= 2 && m[3].length >= 2) flush();
+    });
+    flush();
+    return { matches, teams: [...teams], us, name };
+  }
+  function prep(file) { return new Promise((res, rej) => { const img = new Image(); img.onload = () => {
+    const k = img.width < 1400 ? 2 : 1, c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k;
+    const x = c.getContext("2d"); x.drawImage(img, 0, 0, c.width, c.height); const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+    let sum = 0; for (let i = 0; i < p.length; i += 4) { const g = .299 * p[i] + .587 * p[i + 1] + .114 * p[i + 2]; p[i] = p[i + 1] = p[i + 2] = g; sum += g; }
+    if (sum / (p.length / 4) < 128) for (let i = 0; i < p.length; i += 4) { p[i] = p[i + 1] = p[i + 2] = 255 - p[i]; }
+    x.putImageData(d, 0, 0); c.toBlob(res, "image/png"); }; img.onerror = rej; img.src = URL.createObjectURL(file); }); }
+  const fmtMatch = m => `${m[0]} ${m[1]} | ${m[2].join(" ")} | ${m[3].join(" ")}`.replace(/\s+\|/g, " |");
+  function readMatchBox() {
+    return $("evMatches").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+      const parts = l.split("|"); const head = parts[0].trim().split(/\s+/); const id = head.shift() || "";
+      const toT = s => ((s || "").toUpperCase().match(TEAM_RE) || []);
+      return [id, head.join(" "), toT(parts[1]), toT(parts[2])];
+    }).filter(m => m[0] && (m[2].length || m[3].length));
+  }
+  var tessP = null;
+  function loadTesseract() {
+    if (window.Tesseract) return Promise.resolve();
+    if (!tessP) tessP = new Promise(function (res, rej) {
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      s.onload = res; s.onerror = function () { tessP = null; rej(new Error("load")); };
+      document.head.appendChild(s);
+    });
+    return tessP;
+  }
+  var evSheet = $("evSheet");
+  $("newEv").addEventListener("click", function () {
+    if (!gate()) return;
+    ["evName", "evMatches", "evTeams"].forEach(function (i) { $(i).value = ""; });
+    $("evMsg").textContent = ""; $("ocrMsg").textContent = ""; $("fileLbl").textContent = "Tap to add a photo";
+    delete $("evUs").dataset.touched;
+    evSheet.hidden = false; document.body.style.overflow = "hidden";
+    loadTesseract().catch(function () {});
+  });
+  function closeEv() { evSheet.hidden = true; document.body.style.overflow = ""; }
+  $("evCancel").addEventListener("click", closeEv);
+  $("evUs").addEventListener("input", function () { $("evUs").dataset.touched = "1"; });
+  $("evFile").addEventListener("change", async function (e) {
+    const files = [...e.target.files]; if (!files.length) return;
+    try { $("ocrMsg").textContent = "Loading the photo reader…"; await loadTesseract(); }
+    catch (err) { $("ocrMsg").textContent = "Couldn't load the photo reader. Type the teams in instead."; e.target.value = ""; return; }
+    for (const [i, f] of files.entries()) {
+      $("ocrMsg").textContent = `Reading photo ${i + 1} of ${files.length}…`;
+      try {
+        const w = await Tesseract.createWorker("eng", 1, { logger: m => { if (m.status === "recognizing text") $("ocrMsg").textContent = `Reading photo ${i + 1} of ${files.length}… ${Math.round(m.progress * 100)}%`; } });
+        await w.setParameters({ tessedit_pageseg_mode: "6" });
+        const r = await w.recognize(await prep(f)); await w.terminate();
+        const p = parseText(r.data.text);
+        const haveM = new Set(readMatchBox().map(m => m[0]));
+        const addM = p.matches.filter(m => !haveM.has(m[0])).map(fmtMatch);
+        if (addM.length) $("evMatches").value = ($("evMatches").value.trim() + "\n" + addM.join("\n")).trim();
+        const tset = new Set(($("evTeams").value.toUpperCase().match(TEAM_RE) || [])); p.teams.forEach(t => tset.add(t));
+        $("evTeams").value = [...tset].sort((a, b) => parseInt(a) - parseInt(b) || a.localeCompare(b)).join(" ");
+        if (p.us && !$("evUs").dataset.touched) $("evUs").value = p.us;
+        if (p.name && !$("evName").value.trim()) $("evName").value = p.name;
+        $("ocrMsg").textContent = `Found ${p.matches.length} matches and ${p.teams.length} teams. Check them below.`;
+      } catch (err) { $("ocrMsg").textContent = "Couldn't read that photo. Type the teams in instead."; }
+    }
+    $("fileLbl").textContent = "Add another photo"; e.target.value = "";
+  });
+  $("evSave").addEventListener("click", async function () {
+    if (!gate()) return;
+    const name = $("evName").value.trim(); if (!name) { $("evMsg").textContent = "Name the event first."; return; }
+    const us = ($("evUs").value.toUpperCase().match(TEAM_RE) || ["56721K"])[0];
+    const matches = readMatchBox();
+    const teams = [...new Set([...($("evTeams").value.toUpperCase().match(TEAM_RE) || []), ...matches.flatMap(m => [...m[2], ...m[3]])])].filter(t => t !== us);
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) + "-" + Date.now().toString(36).slice(-4);
+    const d = new Date(), date = d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
+    events[id] = { id, name, us, matches, teams, date, created: d.toISOString() };
+    $("evMsg").textContent = "Saving…";
+    const er = await saveMeta(id);
+    if (er) { $("evMsg").textContent = "Couldn't save: " + er.message; delete events[id]; return; }
+    closeEv(); cur = id; location.hash = "ev=" + encodeURIComponent(id); renderAll(); idleStatus();
+  });
+
+  // ---------- wire up ----------
+  var search = $("search");
+  search.addEventListener("input", function () { query = search.value.trim(); applyFilter(); });
+  $("sort").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-sort]");
+    if (!b) return;
+    sortMode = b.dataset.sort;
+    [].forEach.call(this.querySelectorAll("button"), function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+    sortCards();
+  });
+  $("addForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!gate()) return;
+    var inp = $("addInput");
+    var num = addTeam(inp.value);
+    inp.value = "";
+    if (num) { applyFilter(); jumpTo(num); }
+  });
+  $("evSel").addEventListener("change", function () { cur = this.value; location.hash = "ev=" + encodeURIComponent(cur); renderAll(); });
+  window.addEventListener("hashchange", function () { var p = cur; pickCur(); if (p !== cur) renderAll(); });
+  $("copyAll").addEventListener("click", function () { copyAll(this); });
+  $("showText").addEventListener("click", openSheet);
+  $("sheetCopy").addEventListener("click", function () { try { sheetText.focus(); sheetText.select(); } catch (e) {} copyAll(this); });
+  $("sheetClose").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    if (!sheet.hidden) closeSheet();
+    if (!authSheet.hidden) closeAuth();
+    if (!evSheet.hidden) closeEv();
+  });
+  setInterval(function () { var nx = nextMatchIndex(); [].forEach.call(strip.children, function (c, i) { c.classList.toggle("is-next", i === nx); }); }, 60000);
+
+  // ---------- live updates ----------
+  if (sb) {
+    sb.channel("scout").on("postgres_changes", { event: "*", schema: "public", table: "scout" }, function (p) {
+      var r = p.new;
+      if (!r || !r.team || !loaded) return;
+      if (r.team.indexOf("t:") === 0) {
+        var parts = r.team.split(":"), id = parts[1], team = parts.slice(2).join(":");
+        if (owner && timers[id + ":" + team]) return;
+        var before = JSON.stringify((notes[id] || {})[team] || null);
+        ingest(r);
+        if (id !== cur || JSON.stringify(notes[id][team]) === before) return;
+        if (cards[team]) refreshCard(team);
+        else { ORDER.push(team); list.appendChild(buildCard(team)); sortCards(); }
+        refreshDots(); applyFilter();
+      } else if (r.team.indexOf("ev:") === 0) {
+        var eid = r.team.slice(3), evb = JSON.stringify(events[eid] || null);
+        ingest(r);
+        if (eid === cur && JSON.stringify(events[eid]) !== evb) renderAll(); else renderEvSel();
+      }
+    }).subscribe();
+  }
+  setInterval(function () { if (!owner) load(); }, 20000);
+  paintAuth();
+  load().then(function () { if (sb) sb.auth.getSession().then(function (r) { setOwner(r.data && r.data.session); }); });
+})();
+
+    </script>
+  </body>
 </html>
