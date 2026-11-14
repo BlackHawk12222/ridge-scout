@@ -122,6 +122,7 @@
           <div>
             <h1 id="evTitle">Ridge Scouting · 56721K</h1>
             <p id="evSub">Loading events…</p>
+            <p id="evLive" hidden></p>
           </div>
           <div class="x-top__side">
             <span class="x-save" id="saveStatus" aria-live="polite">Loading…</span>
@@ -262,6 +263,8 @@
   var cur = null, owner = false, loaded = false;
   var US = "56721K", MATCHES = [], ORDER = [];
   var timers = {};
+  var LIVE = {};     // eventId -> live VEX results row data ("live:<eventId>")
+  var liveSig = "";
 
   function blank() { return { tags: [], rating: 0, pick: false, text: "", notes: [] }; }
   function norm(d) {
@@ -276,6 +279,10 @@
   }
   function ingest(r) {
     if (!r || !r.team) return;
+    if (r.team.indexOf("live:") === 0) { // live VEX results, never team notes
+      if (r.data && typeof r.data === "object") LIVE[r.team.slice(5)] = r.data;
+      return;
+    }
     if (r.team.indexOf("ev:") === 0) {
       var id = r.team.slice(3), m = Object.assign({}, r.data || {}, { id: id, saved: true });
       if (id === DEFAULT_EV.id) { // fill display-only extras the saved row may lack
@@ -315,9 +322,7 @@
   function setupEvent() {
     var e = ev();
     US = e.us || "56721K";
-    MATCHES = (e.matches || []).filter(function (m) { return (m[2] || []).concat(m[3] || []).indexOf(US) > -1; }).map(function (m, i) {
-      return { q: m[0], time: m[1] || "", field: m[4] || "", red: m[2] || [], blue: m[3] || [], i: i, min: mins(m[1]) };
-    });
+    buildMatches();
     var o = [];
     MATCHES.forEach(function (m) { m.red.concat(m.blue).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); }); });
     (e.matches || []).forEach(function (m) { (m[2] || []).concat(m[3] || []).forEach(function (t) { if (t !== US && o.indexOf(t) < 0) o.push(t); }); });
@@ -327,6 +332,79 @@
     ORDER.forEach(function (t) { if (!teamsOf(e.id)[t]) teamsOf(e.id)[t] = blank(); });
   }
   function T(num) { return teamsOf(cur)[num]; }
+
+  // ---------- live VEX results ----------
+  function curLive() { var L = cur && LIVE[cur]; return L && Array.isArray(L.matches) && L.matches.length ? L : null; }
+  function liveLabel(x) { return +x.round === 2 ? "Q" + x.n : (x.name || ("Match " + x.n)); }
+  function buildMatches() {
+    var e = ev();
+    MATCHES = (e.matches || []).filter(function (m) { return (m[2] || []).concat(m[3] || []).indexOf(US) > -1; }).map(function (m, i) {
+      return { q: m[0], time: m[1] || "", field: m[4] || "", red: m[2] || [], blue: m[3] || [], i: i, min: mins(m[1]) };
+    });
+    var L = curLive();
+    if (!L) return;
+    var mine = L.matches.filter(function (x) { return x && (x.red || []).concat(x.blue || []).indexOf(US) > -1; }), used = [];
+    MATCHES.forEach(function (m) {
+      var q = String(m.q).match(/^Q\s*#?(\d+)$/i);
+      var lm = mine.filter(function (x) { return used.indexOf(x) < 0 && (q ? (+x.round === 2 && +x.n === +q[1]) : x.name === m.q); })[0];
+      if (!lm) return;
+      used.push(lm); m.live = lm;
+      if ((lm.red || []).length && (lm.blue || []).length) { m.red = lm.red.slice(); m.blue = lm.blue.slice(); }
+    });
+    mine.forEach(function (x) { // matches with us that the strip lacks (elims, schedule changes)
+      if (used.indexOf(x) > -1) return;
+      MATCHES.push({ q: liveLabel(x), time: x.sched || "", field: "", red: (x.red || []).slice(), blue: (x.blue || []).slice(), i: MATCHES.length, min: mins(x.sched), live: x });
+    });
+  }
+  function scoreText(m) {
+    var x = m.live;
+    if (!x || !x.started) return "";
+    var usRed = (x.red || []).indexOf(US) > -1, a = +(usRed ? x.rs : x.bs) || 0, b = +(usRed ? x.bs : x.rs) || 0;
+    return (a > b ? "W " : a < b ? "L " : "T ") + a + "\u2013" + b;
+  }
+  function liveSigOf() { var L = curLive(); return L ? cur + "|" + JSON.stringify(L.matches) : ""; }
+  function renderLiveLine() {
+    var p = $("evLive"), L = curLive();
+    if (!L) { p.hidden = true; p.textContent = ""; return; }
+    var parts = ["Live"];
+    var on = L.matches.filter(function (x) { return +x.round === 2 && !x.started; }).sort(function (a, b) { return a.n - b.n; })[0] ||
+      L.matches.filter(function (x) { return !x.started; })[0];
+    if (on) parts.push(liveLabel(on) + " on field");
+    var r = L.rankings && L.rankings[US];
+    if (r && r.rank) parts.push((US === "56721K" ? "Ridge" : US) + " #" + r.rank + " (" + (r.w || 0) + "-" + (r.l || 0) + "-" + (r.t || 0) + ")");
+    var d = new Date(L.updated || "");
+    if (!isNaN(d)) parts.push("updated " + (d.getHours() % 12 || 12) + ":" + ("0" + d.getMinutes()).slice(-2));
+    p.textContent = parts.join(" \u00b7 ");
+    p.hidden = false;
+  }
+  // repaint what live results touch, without rebuilding team cards
+  function refreshLive() {
+    if (!loaded || !ev()) return;
+    renderLiveLine();
+    var s = liveSigOf();
+    if (s === liveSig) return;
+    liveSig = s;
+    buildMatches();
+    MATCHES.forEach(function (m) {
+      m.red.concat(m.blue).forEach(function (t) {
+        if (t === US || ORDER.indexOf(t) > -1) return;
+        ORDER.push(t);
+        if (!teamsOf(cur)[t]) teamsOf(cur)[t] = blank();
+        list.appendChild(buildCard(t));
+      });
+    });
+    ORDER.forEach(function (n) { if (cards[n]) paintSum(n); });
+    renderStrip(); sortCards(); applyFilter();
+  }
+  function fetchLive() {
+    if (!sb || !cur) return Promise.resolve();
+    var id = cur;
+    return sb.from("scout").select("team,data").eq("team", "live:" + id).maybeSingle().then(function (r) {
+      if (r.error || !r.data) return;
+      ingest(r.data);
+      if (id === cur) refreshLive();
+    }, function () {});
+  }
 
   function withUs(num) {
     var out = [];
@@ -395,6 +473,10 @@
   // ---------- matches strip ----------
   var strip = $("strip");
   function nextMatchIndex() {
+    if (curLive()) {
+      for (var j = 0; j < MATCHES.length; j++) if (MATCHES[j].live && !MATCHES[j].live.started) return j;
+      return -1;
+    }
     var d = evDate(ev()), now = new Date();
     var today = now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
     if (d && d !== today) return -1;
@@ -424,7 +506,7 @@
       var usRed = m.red.indexOf(US) > -1;
       var card = document.createElement("div");
       card.className = "x-match" + (m.i === nx ? " is-next" : "");
-      var info = [m.time, m.field].filter(Boolean).join(" · ") + (m.i === nx ? " · next" : "");
+      var info = [m.time, m.field, scoreText(m)].filter(Boolean).join(" · ") + (m.i === nx ? " · next" : "");
       card.innerHTML = '<div class="x-match__head">' + esc(m.q) + " <span>" + esc(info) + "</span></div>";
       [["red", m.red], ["blue", m.blue]].forEach(function (pair) {
         var row = document.createElement("div");
@@ -725,6 +807,8 @@
     list.innerHTML = "";
     cards = {};
     ORDER.forEach(function (n) { list.appendChild(buildCard(n)); });
+    liveSig = liveSigOf();
+    renderLiveLine();
     renderStrip();
     sortCards();
     applyFilter();
@@ -759,6 +843,7 @@
         });
         refreshDots(); applyFilter();
       }
+      refreshLive();
       idleStatus();
       return true;
     }).catch(function () {
@@ -986,8 +1071,8 @@
     inp.value = "";
     if (num) { applyFilter(); jumpTo(num); }
   });
-  $("evSel").addEventListener("change", function () { cur = this.value; location.hash = "ev=" + encodeURIComponent(cur); renderAll(); });
-  window.addEventListener("hashchange", function () { var p = cur; pickCur(); if (p !== cur) renderAll(); });
+  $("evSel").addEventListener("change", function () { cur = this.value; location.hash = "ev=" + encodeURIComponent(cur); renderAll(); fetchLive(); });
+  window.addEventListener("hashchange", function () { var p = cur; pickCur(); if (p !== cur) { renderAll(); fetchLive(); } });
   $("copyAll").addEventListener("click", function () { copyAll(this); });
   $("showText").addEventListener("click", openSheet);
   $("sheetCopy").addEventListener("click", function () { try { sheetText.focus(); sheetText.select(); } catch (e) {} copyAll(this); });
@@ -1014,6 +1099,9 @@
         if (cards[team]) refreshCard(team);
         else { ORDER.push(team); list.appendChild(buildCard(team)); sortCards(); }
         refreshDots(); applyFilter();
+      } else if (r.team.indexOf("live:") === 0) {
+        ingest(r);
+        if (r.team.slice(5) === cur) refreshLive();
       } else if (r.team.indexOf("ev:") === 0) {
         var eid = r.team.slice(3), evb = JSON.stringify(events[eid] || null);
         ingest(r);
@@ -1022,6 +1110,7 @@
     }).subscribe();
   }
   setInterval(function () { if (!owner) load(); }, 20000);
+  setInterval(fetchLive, 60000); // live results fallback for everyone, owner included
   paintAuth();
   load().then(function () { if (sb) sb.auth.getSession().then(function (r) { setOwner(r.data && r.data.session); }); });
 })();
