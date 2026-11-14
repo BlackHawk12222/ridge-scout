@@ -61,7 +61,7 @@ label.lb{display:block;font-size:12px;color:var(--mut);margin:10px 0 4px}
   </div>
 </header>
 <main>
-  <div id="viewNote" class="banner">View only. Archer's notes update here live.</div>
+  <div id="viewNote" class="banner">View only. Tap Sign in (top right) to edit.</div>
   <section id="matchSec"><h2>Our matches</h2><div id="matches"></div></section>
   <section><h2>Teams</h2><div id="teams"></div>
     <div id="addWrap" class="card hidden"><div class="row"><input id="newTeam" placeholder="Add a team (e.g. 1234A)"><button class="btn" id="addTeam">Add</button></div></div>
@@ -106,7 +106,7 @@ const DEFAULT_EV = { id:"fisher-2026", name:"Fisher · Nov 14, 2026", us:"56721K
   ["Q64","2:50 PM",["81207E","59936B"],["9821A","56721K"]],
 ]};
 
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"pkce"}});
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:"implicit"}});
 let events = {};   // id -> meta
 let notes = {};    // id -> team -> {rating,tags,pick,note,updated_at}
 let cur = null, owner = false, sortMode = "schedule", pickOnly = false;
@@ -158,12 +158,12 @@ function renderTeams(){
   const e=ev(), data=notes[e.id]||{}, dis=owner?"":"disabled";
   $("teams").innerHTML = teamList().map(t => {
     const d=data[t]||blank();
-    const stars=[1,2,3,4,5].map(n=>`<button ${dis} class="${n<=d.rating?"on":""}" data-star="${esc(t)}" data-n="${n}">★</button>`).join("");
-    const tags=TAGS.map(g=>`<button ${dis} class="pill tag ${d.tags.includes(g)?"on":""}" data-tag="${esc(t)}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
+    const stars=[1,2,3,4,5].map(n=>`<button class="${n<=d.rating?"on":""}" data-star="${esc(t)}" data-n="${n}">★</button>`).join("");
+    const tags=TAGS.map(g=>`<button class="pill tag ${d.tags.includes(g)?"on":""}" data-tag="${esc(t)}" data-g="${esc(g)}">${esc(g)}</button>`).join("");
     const when=d.updated_at?"Updated "+new Date(d.updated_at).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}):"";
-    return `<div class="card" id="t-${esc(t)}"><div class="th"><span class="tn">${esc(t)}</span><div class="stars">${stars}</div><div class="sp"></div><button ${dis} class="pill pick ${d.pick?"on":""}" data-pick="${esc(t)}">${d.pick?"✓ Would pick":"Would pick"}</button></div>
+    return `<div class="card" id="t-${esc(t)}"><div class="th"><span class="tn">${esc(t)}</span><div class="stars">${stars}</div><div class="sp"></div><button class="pill pick ${d.pick?"on":""}" data-pick="${esc(t)}">${d.pick?"✓ Would pick":"Would pick"}</button></div>
       <div class="nexts">${nextMatch(e,t)}</div><div class="tags">${tags}</div>
-      <textarea ${dis} data-note="${esc(t)}" placeholder="${owner?"Notes":"No notes yet"}">${esc(d.note||"")}</textarea><div class="meta">${when}</div></div>`;
+      <textarea ${owner?"":"readonly"} data-note="${esc(t)}" placeholder="${owner?"Notes":"No notes yet"}">${esc(d.note||"")}</textarea><div class="meta">${when}</div></div>`;
   }).join("") || `<div class="banner">No teams yet.</div>`;
 }
 function render(){ renderEvSel(); renderMatches(); renderTeams();
@@ -203,7 +203,7 @@ function edit(t,fn){ const n=notes[cur]=notes[cur]||{}; n[t]=n[t]||blank(); fn(n
 document.addEventListener("click", e => {
   const el=e.target.closest("button,[data-jump]"); if(!el) return;
   if (el.dataset.jump){ const c=$("t-"+el.dataset.jump); if(c) c.scrollIntoView({behavior:"smooth",block:"center"}); return; }
-  if (!owner) return;
+  if (!owner){ if(el.dataset.star||el.dataset.tag||el.dataset.pick) $("authBtn").click(); return; }
   if (el.dataset.star){ const t=el.dataset.star,n=+el.dataset.n; edit(t,d=>d.rating=d.rating===n?0:n); renderTeams(); }
   else if (el.dataset.tag){ const t=el.dataset.tag,g=el.dataset.g; edit(t,d=>d.tags=d.tags.includes(g)?d.tags.filter(x=>x!==g):[...d.tags,g]); renderTeams(); }
   else if (el.dataset.pick){ const t=el.dataset.pick; edit(t,d=>d.pick=!d.pick); renderTeams(); }
